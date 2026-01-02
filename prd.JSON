@@ -1,0 +1,116 @@
+{
+  "project_title": "Conversation Allocation & Operator Workflow Backend",
+  "description": "This system handles conversation allocation to operators, manages operator workflows, and tracks grace periods for offline operators. It provides real-time updates and ensures efficient conversation prioritization and operator availability management.",
+  "version": "1.0.0",
+  "goals": [
+    "Efficiently allocate conversations to operators based on priority.",
+    "Manage operator availability and grace periods when operators go offline.",
+    "Provide real-time updates to the frontend whenever a conversation state changes.",
+    "Ensure the system is easily deployable for demo purposes using Supabase and Node.js.",
+    "Optimize the system for scalability to handle increasing load."
+  ],
+  "features": [
+    {
+      "name": "Conversation Allocation",
+      "description": "Allocate conversations to available operators based on priority score.",
+      "acceptance_criteria": [
+        "Conversations are prioritized based on message count and delay.",
+        "Operators can claim conversations from their subscribed inboxes.",
+        "Row-level locking ensures no race conditions during allocation."
+      ]
+    },
+    {
+      "name": "Grace Period Management",
+      "description": "Track and manage grace periods when an operator goes offline and ensure conversations are reassigned after a specified time.",
+      "acceptance_criteria": [
+        "When an operator goes offline, assigned conversations enter a grace period.",
+        "If the operator does not come back online within the grace period, conversations are moved to the queue.",
+        "If the operator comes back online within the grace period, they retain their assigned conversations."
+      ]
+    },
+    {
+      "name": "Real-Time Updates",
+      "description": "Send real-time updates to the frontend when conversation states change or operator status changes.",
+      "acceptance_criteria": [
+        "The frontend receives real-time notifications when a conversation is allocated, resolved, or deallocated.",
+        "Operator status changes are broadcast in real-time to the frontend."
+      ]
+    }
+  ],
+  "database_schema": {
+    "tenants": {
+      "description": "Stores information about each tenant.",
+      "columns": [
+        { "name": "id", "type": "SERIAL", "primary_key": true },
+        { "name": "name", "type": "VARCHAR(255)", "required": true },
+        { "name": "created_at", "type": "TIMESTAMP", "default": "NOW()" },
+        { "name": "updated_at", "type": "TIMESTAMP", "default": "NOW()" }
+      ]
+    },
+    "inboxes": {
+      "description": "Represents each communication channel for a tenant (e.g., phone numbers).",
+      "columns": [
+        { "name": "id", "type": "SERIAL", "primary_key": true },
+        { "name": "tenant_id", "type": "INT", "foreign_key": "tenants(id)", "required": true },
+        { "name": "phone_number", "type": "VARCHAR(20)", "required": true, "unique": true },
+        { "name": "created_at", "type": "TIMESTAMP", "default": "NOW()" },
+        { "name": "updated_at", "type": "TIMESTAMP", "default": "NOW()" }
+      ]
+    },
+    "operators": {
+      "description": "Stores information about operators who handle conversations.",
+      "columns": [
+        { "name": "id", "type": "SERIAL", "primary_key": true },
+        { "name": "name", "type": "VARCHAR(255)", "required": true },
+        { "name": "status", "type": "ENUM('AVAILABLE', 'OFFLINE', 'AWAY')", "default": "'AVAILABLE'" },
+        { "name": "created_at", "type": "TIMESTAMP", "default": "NOW()" },
+        { "name": "updated_at", "type": "TIMESTAMP", "default": "NOW()" }
+      ]
+    },
+    "conversations": {
+      "description": "Stores metadata about conversations, including state, assigned operator, and priority score.",
+      "columns": [
+        { "name": "id", "type": "SERIAL", "primary_key": true },
+        { "name": "tenant_id", "type": "INT", "foreign_key": "tenants(id)", "required": true },
+        { "name": "inbox_id", "type": "INT", "foreign_key": "inboxes(id)", "required": true },
+        { "name": "state", "type": "ENUM('QUEUED', 'ALLOCATED', 'RESOLVED')", "default": "'QUEUED'" },
+        { "name": "assigned_operator_id", "type": "INT", "foreign_key": "operators(id)", "nullable": true },
+        { "name": "message_count", "type": "INT", "default": 0 },
+        { "name": "last_message_at", "type": "TIMESTAMP" },
+        { "name": "priority_score", "type": "DECIMAL(10, 2)" },
+        { "name": "created_at", "type": "TIMESTAMP", "default": "NOW()" },
+        { "name": "updated_at", "type": "TIMESTAMP", "default": "NOW()" }
+      ]
+    },
+    "grace_period_assignments": {
+      "description": "Tracks conversations in grace period for offline operators.",
+      "columns": [
+        { "name": "id", "type": "SERIAL", "primary_key": true },
+        { "name": "operator_id", "type": "INT", "foreign_key": "operators(id)", "required": true },
+        { "name": "conversation_id", "type": "INT", "foreign_key": "conversations(id)", "required": true },
+        { "name": "expiration_time", "type": "TIMESTAMP", "required": true }
+      ]
+    }
+  },
+  "apis": {
+    "get_inboxes": {
+      "method": "GET",
+      "endpoint": "/inboxes",
+      "description": "Fetches a list of inboxes available to the operator.",
+      "response": [
+        { "id": "int", "phone_number": "string", "tenant_id": "int" }
+      ]
+    },
+    "allocate_conversation": {
+      "method": "POST",
+      "endpoint": "/conversations/allocate",
+      "description": "Allocates the next queued conversation to the operator.",
+      "request": { "operator_id": "int", "conversation_id": "int" },
+      "response": { "message": "string", "status": "string" }
+    },
+    "resolve_conversation": {
+      "method": "POST",
+      "endpoint": "/conversations/resolve",
+      "description": "Marks the conversation as resolved.",
+      "request": { "conversation_id": "int" },
+      "response": { "message": "string", "status": "string" }

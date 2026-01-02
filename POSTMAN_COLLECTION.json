@@ -1,0 +1,594 @@
+{
+  "info": {
+    "name": "Conversation Allocation System API",
+    "description": "Complete API collection for testing the Conversation Allocation System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "operatorId",
+      "value": "1",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["health"]
+        }
+      }
+    },
+    {
+      "name": "Conversations",
+      "item": [
+        {
+          "name": "List Conversations (All)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Operator-Id",
+                "value": "{{operatorId}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/conversations?limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["conversations"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "List Conversations (Queued)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Operator-Id",
+                "value": "{{operatorId}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/conversations?state=QUEUED&sort=priority&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["conversations"],
+              "query": [
+                {
+                  "key": "state",
+                  "value": "QUEUED"
+                },
+                {
+                  "key": "sort",
+                  "value": "priority"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "List Conversations (By Inbox)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Operator-Id",
+                "value": "{{operatorId}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/conversations?inbox_id=1&state=QUEUED",
+              "host": ["{{baseUrl}}"],
+              "path": ["conversations"],
+              "query": [
+                {
+                  "key": "inbox_id",
+                  "value": "1"
+                },
+                {
+                  "key": "state",
+                  "value": "QUEUED"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Auto-Allocate Conversation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Operator-Id",
+                "value": "{{operatorId}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"operator_id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/conversations/allocate",
+              "host": ["{{baseUrl}}"],
+              "path": ["conversations", "allocate"]
+            }
+          }
+        },
+        {
+          "name": "Claim Conversation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Operator-Id",
+                "value": "{{operatorId}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"operator_id\": 1,\n  \"conversation_id\": 3\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/conversations/claim",
+              "host": ["{{baseUrl}}"],
+              "path": ["conversations", "claim"]
+            }
+          }
+        },
+        {
+          "name": "Resolve Conversation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Operator-Id",
+                "value": "{{operatorId}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"conversation_id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/conversations/resolve",
+              "host": ["{{baseUrl}}"],
+              "path": ["conversations", "resolve"]
+            }
+          }
+        },
+        {
+          "name": "Deallocate Conversation (Manager)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Operator-Id",
+                "value": "3",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"conversation_id\": 5\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/conversations/deallocate",
+              "host": ["{{baseUrl}}"],
+              "path": ["conversations", "deallocate"]
+            }
+          }
+        },
+        {
+          "name": "Reassign Conversation (Manager)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Operator-Id",
+                "value": "3",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"conversation_id\": 5,\n  \"operator_id\": 2\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/conversations/reassign",
+              "host": ["{{baseUrl}}"],
+              "path": ["conversations", "reassign"]
+            }
+          }
+        },
+        {
+          "name": "Move Conversation to Inbox (Manager)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Operator-Id",
+                "value": "3",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"conversation_id\": 5,\n  \"inbox_id\": 2\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/conversations/move-inbox",
+              "host": ["{{baseUrl}}"],
+              "path": ["conversations", "move-inbox"]
+            }
+          }
+        },
+        {
+          "name": "Search by Phone Number",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Operator-Id",
+                "value": "{{operatorId}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/conversations/search?phone_number=%2B19876543211",
+              "host": ["{{baseUrl}}"],
+              "path": ["conversations", "search"],
+              "query": [
+                {
+                  "key": "phone_number",
+                  "value": "%2B19876543211"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Operators",
+      "item": [
+        {
+          "name": "Get Operator Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Operator-Id",
+                "value": "{{operatorId}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/operators/1/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["operators", "1", "status"]
+            }
+          }
+        },
+        {
+          "name": "Update Status to Available",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "X-Operator-Id",
+                "value": "{{operatorId}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"AVAILABLE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/operators/1/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["operators", "1", "status"]
+            }
+          }
+        },
+        {
+          "name": "Update Status to Offline",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "X-Operator-Id",
+                "value": "{{operatorId}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"OFFLINE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/operators/1/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["operators", "1", "status"]
+            }
+          }
+        },
+        {
+          "name": "Get Operator Inboxes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Operator-Id",
+                "value": "{{operatorId}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/operators/1/inboxes",
+              "host": ["{{baseUrl}}"],
+              "path": ["operators", "1", "inboxes"]
+            }
+          }
+        },
+        {
+          "name": "Get Operator Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Operator-Id",
+                "value": "{{operatorId}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/operators/1/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["operators", "1", "stats"]
+            }
+          }
+        },
+        {
+          "name": "List All Operators (Manager)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Operator-Id",
+                "value": "3",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/operators",
+              "host": ["{{baseUrl}}"],
+              "path": ["operators"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Labels",
+      "item": [
+        {
+          "name": "List Labels",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Operator-Id",
+                "value": "{{operatorId}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/labels?inbox_id=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["labels"],
+              "query": [
+                {
+                  "key": "inbox_id",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Label",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Operator-Id",
+                "value": "{{operatorId}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"inbox_id\": 1,\n  \"name\": \"VIP Customer\",\n  \"color\": \"#FFD700\",\n  \"created_by\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/labels",
+              "host": ["{{baseUrl}}"],
+              "path": ["labels"]
+            }
+          }
+        },
+        {
+          "name": "Update Label",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "X-Operator-Id",
+                "value": "{{operatorId}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Super Urgent\",\n  \"color\": \"#FF0000\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/labels/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["labels", "1"]
+            }
+          }
+        },
+        {
+          "name": "Delete Label",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Operator-Id",
+                "value": "{{operatorId}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/labels/6",
+              "host": ["{{baseUrl}}"],
+              "path": ["labels", "6"]
+            }
+          }
+        },
+        {
+          "name": "Attach Label to Conversation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Operator-Id",
+                "value": "{{operatorId}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"conversation_id\": 3,\n  \"label_id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/labels/attach",
+              "host": ["{{baseUrl}}"],
+              "path": ["labels", "attach"]
+            }
+          }
+        },
+        {
+          "name": "Detach Label from Conversation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Operator-Id",
+                "value": "{{operatorId}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"conversation_id\": 3,\n  \"label_id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/labels/detach",
+              "host": ["{{baseUrl}}"],
+              "path": ["labels", "detach"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
